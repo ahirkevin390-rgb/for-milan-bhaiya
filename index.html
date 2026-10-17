@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sorry Milan Bhaiya</title>
+
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      background: #d9c3a5;
+      color: #5b4636;
+      font-family: "Inter", Arial, sans-serif;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(25px) scale(0.98);
+      transition:
+        opacity 0.7s ease,
+        transform 0.7s ease,
+        visibility 0.7s ease;
+    }
+
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      max-height: 93vh;
+      overflow-y: auto;
+      text-align: center;
+      background: #e9d7bf;
+      border: 2px solid #c98a8a;
+      border-radius: 24px;
+      padding: 40px 26px;
+      box-shadow: 0 20px 70px rgba(90, 55, 35, 0.25);
+      animation: cardEnter 0.8s ease;
+    }
+
+    .card::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .card::-webkit-scrollbar-thumb {
+      background: #c98a8a;
+      border-radius: 10px;
+    }
+
+    .emoji {
+      font-size: 52px;
+      margin-bottom: 18px;
+      animation: bounce 2s infinite;
+    }
+
+    h1 {
+      font-size: clamp(32px, 8vw, 47px);
+      color: #a8324f;
+      text-shadow:
+        0 0 8px rgba(255, 182, 193, 0.9),
+        0 0 20px rgba(255, 105, 140, 0.7),
+        0 0 38px rgba(255, 105, 140, 0.45);
+      margin-bottom: 20px;
+      animation: glowPulse 2.5s infinite;
+    }
+
+    h2 {
+      color: #a8324f;
+      font-size: 30px;
+      margin-bottom: 18px;
+    }
+
+    p {
+      color: #6b5340;
+      font-size: 15px;
+      line-height: 1.75;
+      margin-bottom: 25px;
+    }
+
+    .reveal-text {
+      color: #c2185b;
+      font-weight: 600;
+      line-height: 1.7;
+      text-shadow: 0 0 10px rgba(255, 182, 193, 0.8);
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      background: #a8324f;
+      color: #fff;
+      padding: 14px 26px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: #c2185b;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(168, 50, 79, 0.35);
+    }
+
+    .full-button {
+      width: 100%;
+    }
+
+    .secondary-button {
+      margin-top: 24px;
+      background: transparent;
+      border: 1px solid #a8324f;
+      color: #a8324f;
+    }
+
+    .secondary-button:hover {
+      background: rgba(168, 50, 79, 0.1);
+      box-shadow: none;
+    }
+
+    .message-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .message-card {
+      text-align: left;
+      padding: 17px;
+      border: 1px solid #c98a8a;
+      border-radius: 16px;
+      background: #f3e5d2;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .message-card:hover {
+      border-color: #a8324f;
+      transform: translateY(-2px);
+    }
+
+    .message-title {
+      color: #a8324f;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .message-reveal {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      font-size: 14px;
+      transition:
+        max-height 0.7s ease,
+        opacity 0.7s ease,
+        margin-top 0.7s ease;
+    }
+
+    .message-card.open .message-reveal {
+      max-height: 130px;
+      opacity: 1;
+      margin-top: 12px;
+    }
+
+    #pageTwoNext {
+      display: none;
+      margin-top: 24px;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .choice-area {
+      position: relative;
+      min-height: 125px;
+      margin-top: 24px;
+      display: none;
+      animation: fadeUp 0.7s ease;
+    }
+
+    .choice-buttons {
+      position: relative;
+      height: 125px;
+    }
+
+    #acceptButton,
+    #declineButton {
+      position: absolute;
+      background: #b3122f;
+      color: #fff;
+      min-width: 125px;
+    }
+
+    #acceptButton {
+      left: 10%;
+      top: 52px;
+    }
+
+    #declineButton {
+      left: 58%;
+      top: 52px;
+      transition:
+        left 0.35s ease,
+        top 0.35s ease,
+        transform 0.35s ease;
+    }
+
+    #thankYou {
+      display: none;
+      margin-top: 22px;
+      color: #c2185b;
+      font-size: 17px;
+      line-height: 1.7;
+      text-shadow: 0 0 12px rgba(255, 182, 193, 0.8);
+      animation: fadeUp 0.8s ease;
+    }
+
+    .credit {
+      margin-top: 28px;
+      color: #8a6d55;
+      font-size: 11px;
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.94) translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow:
+          0 0 8px rgba(255, 182, 193, 0.9),
+          0 0 20px rgba(255, 105, 140, 0.7),
+          0 0 38px rgba(255, 105, 140, 0.45);
+      }
+
+      50% {
+        text-shadow:
+          0 0 12px rgba(255, 182, 193, 1),
+          0 0 28px rgba(255, 105, 140, 0.9),
+          0 0 50px rgba(255, 105, 140, 0.6);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PAGE ONE -->
+  <section id="pageOne" class="screen active">
+    <div class="card">
+      <div class="emoji">🙏</div>
+
+      <h1>Sorry Milan Bhaiya</h1>
+
+      <p>
+        We want to say something important to you.
+      </p>
+
+      <button class="full-button" onclick="showPage(2)">
+        Next
+      </button>
+
+      <div class="credit">Made with respect and love</div>
+    </div>
+  </section>
+
+  <!-- PAGE TWO -->
+  <section id="pageTwo" class="screen">
+    <div class="card">
+      <div class="emoji">🥺</div>
+
+      <h2>Please Read</h2>
+
+      <p>
+        Please click each message below.
+      </p>
+
+      <div class="message-list">
+
+        <div class="message-card" onclick="openMessage(this)">
+          <div class="message-title">1. Our apology</div>
+
+          <div class="message-reveal reveal-text">
+            Sorry, Bhaiya.
+          </div>
+        </div>
+
+        <div class="message-card" onclick="openMessage(this)">
+          <div class="message-title">2. Our promise</div>
+
+          <div class="message-reveal reveal-text">
+            This will not happen from now on.
+          </div>
+        </div>
+
+        <div class="message-card" onclick="openMessage(this)">
+          <div class="message-title">3. Why we are sorry</div>
+
+          <div class="message-reveal reveal-text">
+            Milan Bhaiya is our teacher, and he got hurt because of us.
+            That is why we are doing this.
+          </div>
+        </div>
+
+      </div>
+
+      <button id="pageTwoNext" onclick="showPage(3)">
+        Next →
+      </button>
+
+      <br>
+
+      <button class="secondary-button" onclick="showPage(1)">
+        Back
+      </button>
+    </div>
+  </section>
+
+  <!-- PAGE THREE -->
+  <section id="pageThree" class="screen">
+    <div class="card">
+      <div class="emoji">💗</div>
+
+      <h2>From the Bottom of Our Heart</h2>
+
+      <p>
+        Milan Bhaiya, sorry from the bottom of our heart.
+        <br>
+        Please forgive us.
+      </p>
+
+      <button class="full-button" onclick="showChoices()">
+        Please choose one
+      </button>
+
+      <div class="choice-area" id="choiceArea">
+        <div class="choice-buttons">
+          <button id="acceptButton" onclick="acceptForgiveness()">
+            Accept
+          </button>
+
+          <button id="declineButton" onclick="moveDecline()">
+            Decline
+          </button>
+        </div>
+
+        <div id="thankYou">
+          Thank you, Milan Bhaiya, for forgiving us.
+          <br>
+          We promise this will never happen again. 🙏
+        </div>
+      </div>
+
+      <button class="secondary-button" onclick="showPage(2)">
+        Back
+      </button>
+    </div>
+  </section>
+
+  <script>
+    const pages = [
+      document.getElementById("pageOne"),
+      document.getElementById("pageTwo"),
+      document.getElementById("pageThree")
+    ];
+
+    let openedMessages = 0;
+
+    function showPage(pageNumber) {
+      pages.forEach(page => page.classList.remove("active"));
+      pages[pageNumber - 1].classList.add("active");
+    }
+
+    function openMessage(card) {
+      if (!card.classList.contains("open")) {
+        openedMessages++;
+      }
+
+      card.classList.toggle("open");
+
+      if (openedMessages >= 3) {
+        document.getElementById("pageTwoNext").style.display = "inline-block";
+      }
+    }
+
+    function showChoices() {
+      document.getElementById("choiceArea").style.display = "block";
+    }
+
+    function acceptForgiveness() {
+      document.querySelector(".choice-buttons").style.display = "none";
+      document.getElementById("thankYou").style.display = "block";
+    }
+
+    function moveDecline() {
+      const button = document.getElementById("declineButton");
+      const area = document.querySelector(".choice-buttons");
+
+      const newLeft = Math.random() * Math.max(0, area.clientWidth - 130);
+      const newTop = Math.random() * Math.max(0, area.clientHeight - 48);
+
+      button.style.left = `${newLeft}px`;
+      button.style.top = `${newTop}px`;
+    }
+  </script>
+
+</body>
+</html>
